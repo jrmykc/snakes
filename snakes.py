@@ -16,7 +16,7 @@ wn.title("Snakes by Jeremy")
 wn.bgcolor("black")
 wn.tracer(0)
 
-# Pen
+# Pen to draw score
 pen = turtle.Turtle()
 pen.speed(0)
 pen.shape("square")
