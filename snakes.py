@@ -2,21 +2,19 @@ import turtle
 import time
 import random
 
+# determines how fast the game runs 
 delay = 0.05
+# the user's score
 score = 0
-# read and save highscore from textfile
-with open("snake_highscore.txt", "r") as highscore_data:
-    data = highscore_data.read()
-    highscore = int(data)
 
-# Create Window
+# create window
 wn = turtle.Screen()
 wn.setup(width=500, height=500)
-wn.title("Snakes by Jeremy")
+wn.title("Snakes by Jeremy Koch")
 wn.bgcolor("black")
-wn.tracer(0)
+wn.tracer(0) # turns off the animation
 
-# Pen
+# create pen object to display score
 pen = turtle.Turtle()
 pen.speed(0)
 pen.shape("square")
@@ -24,9 +22,10 @@ pen.color("white")
 pen.penup()
 pen.hideturtle()
 pen.goto(0, 200)
-pen.write("Score: 0 Highscore: {}".format(highscore), align="center", font=("Courier", 14, "normal"))
+pen.write("Score: {}".format(score), align="center", font=("Courier", 14, "normal"))
 
-# Snakehead
+
+# create the snakes head
 head = turtle.Turtle()
 head.speed(0)
 head.shape("square")
@@ -35,10 +34,10 @@ head.penup()
 head.goto(0,0)
 head.direction = "stop"
 
-# Snakebody
+# initialize the snakes body
 segments = []
 
-# Apple
+# create the apple that the snake 'eats'
 apple = turtle.Turtle()
 apple.speed(0)
 apple.shape("circle")
@@ -46,7 +45,7 @@ apple.color("red")
 apple.penup()
 apple.goto(random.randrange(-240, 240, 1), random.randrange(-240, 240, 1))
 
-# Snake Movement
+# snake movement with 'wasd' and arrow keys
 def move():
     if head.direction == "up":
         head.sety(head.ycor() + 20)
@@ -79,7 +78,7 @@ def go_right():
     if head.direction != "left":
         head.direction = "right"    
 
-# Listen
+# Listeners
 wn.listen()
 wn.onkeypress(go_up, "w")
 wn.onkeypress(go_down, "s")
@@ -97,56 +96,44 @@ while True:
     # Check collision with border
     if head.xcor() > 240 or head.xcor() < -240 or head.ycor() > 240 or head.ycor() < -240:
         pen.clear()
-        if score > highscore:
-            highscore = score
-            pen.write("Game Over - NEW HIGHSCORE! = {}".format(highscore), align="center", font=("Courier", 14, "normal"))
-            # Write new highscore in textfile
-            f = open("snake_highscore.txt", "w")
-            f.write(str(highscore))
-        else:
-            pen.write("Game Over - Score = {}".format(score), align="center", font=("Courier", 14, "normal"))
-        time.sleep(2)
+        pen.write("Game Over - Score = {}".format(score), align="center", font=("Courier", 14, "normal"))
+        time.sleep(2) # not optimal (better: wait for user input)
         head.goto(0,0)
         head.direction = "stop"
         score = 0
         pen.clear()
-        pen.write("Score: {} Highscore: {}".format(score, highscore), align="center", font=("Courier", 14, "normal"))
+        pen.write("Score: {}".format(score), align="center", font=("Courier", 14, "normal"))
         for segment in segments:
             segment.goto(1000,1000)
         segments.clear()
+        apple.goto(random.randrange(-240, 240, 1), random.randrange(-240, 240, 1))
 
     # Check collision with body
     for segment in segments:
         if head.distance(segment) < 20:
             pen.clear()
-            if score > highscore:
-                highscore = score
-                pen.write("Game Over - NEW HIGHSCORE! = {}".format(highscore), align="center", font=("Courier", 14, "normal"))
-                # write new highscore in textfile
-                f = open("snake_highscore.txt", "w")
-                f.write(str(highscore))
-            else:
-                pen.write("Game Over - Score = {}".format(score), align="center", font=("Courier", 14, "normal"))
+            pen.write("Game Over - Score = {}".format(score), align="center", font=("Courier", 14, "normal"))
             time.sleep(2)
             head.goto(0,0)
             head.direction = "stop"
             score = 0
             pen.clear()
-            pen.write("Score: {} Highscore: {}".format(score, highscore), align="center", font=("Courier", 14, "normal"))
+            pen.write("Score: {}".format(score), align="center", font=("Courier", 14, "normal"))
             for segment in segments:
                 segment.goto(1000,1000)
             segments.clear()
+            apple.goto(random.randrange(-240, 240, 1), random.randrange(-240, 240, 1))
     
-    # Collision with apple
+    # snakes eats apple
     if head.distance(apple) < 20:
-        # Update score
+        # update score
         score += 1
         pen.clear()
-        pen.write("Score: {} Highscore {}".format(score, highscore), align="center", font=("Courier", 14, "normal"))
-        # Update apple position
+        pen.write("Score: {}".format(score), align="center", font=("Courier", 14, "normal"))
+        # update apple position
         apple.goto(random.randrange(-240, 240, 1), random.randrange(-240, 240, 1))
 
-        # Create new segment
+        # create new segment
         new_segment = turtle.Turtle()
         new_segment.speed(0)
         new_segment.shape("square")
@@ -154,18 +141,18 @@ while True:
         new_segment.penup()
         segments.append(new_segment)
 
-    # Move end segments first in reverse order
+    # move end segments first in reverse order
     for index in range(len(segments) - 1, 0, -1):
         x = segments[index-1].xcor()
         y = segments[index-1].ycor()
         segments[index].goto(x, y)
 
-    # Move segment 0 to head
+    # move segment 0 to head
     if len(segments) > 0:
         x = head.xcor()
         y = head.ycor()
         segments[0].goto(x,y)
 
     move()
-
+    
     time.sleep(delay)
